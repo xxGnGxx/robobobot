@@ -18,11 +18,8 @@ parameters =  aruco.DetectorParameters_create()
 aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_250)
 
 def get_markers():
-    foo = 0
-    for i in range(0,10):
-        cap.grab()
-    ret, frame = cap.read() # start using the frame
-    
+    ret, frame = getFrame()
+
     if (frame is None):
         print("frame could not be read.")
 
@@ -33,9 +30,15 @@ def get_markers():
 
     if ret:
        corners, ids, rejectedImgPoints = aruco.detectMarkers(frame, aruco_dict, parameters=parameters)
-       return corners, ids
+       return corners, ids, frame
 
     return ([], [])
+
+def getFrame():
+    for i in range(0,10):
+        cap.grab()
+    ret, frame = cap.read() # start using the frame
+    return ret, frame    
 
 def release():
     # When everything done, release the capture
