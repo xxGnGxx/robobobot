@@ -14,6 +14,7 @@ python3 -m pip install numpy
 python3 -m pip install opencv-contrib-python
 ```
 
+s
 
 Steps to run:
 On the laptop,
