@@ -15,6 +15,8 @@ ARUCO_ID = 10 # Your robot's ARUCO ID
 ARUCO_ID = 15 # Your robot's ARUCO ID
 fast = cv2.FastFeatureDetector_create()
 
+pd_controller = Encoder()
+
 # Set the range of HSV for ball detection here
 # You may need to recalibrate when lighting conditions change
 PINK_HSV_RANGE = (
@@ -171,6 +173,13 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
         pos = bot.get_position()
         arr = bot.startGetBalls()
+
+        while True:
+            if arr:
+                target = arr
+                break
+            else:
+                arr = bot.startGetBalls()
         
         if(FLIP_COORDINATES):
             pos = (-pos[0], -pos[1], pos[2] + math.pi)
