@@ -13,7 +13,7 @@ On the **laptop**, install numpy and opencv including aruco with pip (check [thi
 python3 -m pip install numpy
 python3 -m pip install opencv-contrib-python
 ```
-
+test
 
 Steps to run:
 On the laptop,
