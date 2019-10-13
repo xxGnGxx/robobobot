@@ -8,7 +8,7 @@ import aruco_coordinator_newtek as aruco_coordinator
 # import aruco_coordinator # switch to this for Raspi camera
 
 HOST = '192.168.43.194'#'10.42.0.65'  # The server's (robot's) hostname or IP address
-HOST = '192.168.1.106'#'10.42.0.65'  # The server's (robot's) hostname or IP address
+HOST = '192.168.1.5'#'10.42.0.65'  # The server's (robot's) hostname or IP address
 #HOST = '127.0.0.1'#'10.42.0.65'  # The server's (robot's) hostname or IP address
 PORT = 1222        # The port used by the server
 ARUCO_ID = 10 # Your robot's ARUCO ID
