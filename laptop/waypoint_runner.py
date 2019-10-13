@@ -157,7 +157,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         [200, 200]
     ]
 
-    target_id = 0
+    target_id = 1
     speed = 100 # robot speed
     lastX = 0
     lastY = 0
