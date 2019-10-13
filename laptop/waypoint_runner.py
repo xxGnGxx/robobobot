@@ -8,14 +8,12 @@ import aruco_coordinator_newtek as aruco_coordinator
 # import aruco_coordinator # switch to this for Raspi camera
 
 HOST = '192.168.43.194'#'10.42.0.65'  # The server's (robot's) hostname or IP address
-HOST = '192.168.1.56'#'10.42.0.65'  # The server's (robot's) hostname or IP address
+HOST = '192.168.1.106'#'10.42.0.65'  # The server's (robot's) hostname or IP address
 #HOST = '127.0.0.1'#'10.42.0.65'  # The server's (robot's) hostname or IP address
 PORT = 1222        # The port used by the server
 ARUCO_ID = 10 # Your robot's ARUCO ID
 ARUCO_ID = 15 # Your robot's ARUCO ID
 fast = cv2.FastFeatureDetector_create()
-
-pd_controller = Encoder()
 
 # Set the range of HSV for ball detection here
 # You may need to recalibrate when lighting conditions change
@@ -111,7 +109,7 @@ class Botsy:
             frame = cv2.bitwise_and(frame, frame, mask= bot.get_yellow_balls(frame))
             #cv2.imshow("mask", frame)
             balls = bot.detect_balls(fast, frame)
-            print(balls)
+            #print(balls)
             if cv2.waitKey(1) == 23:
                 break
             return balls
@@ -164,22 +162,28 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     lastX = 0
     lastY = 0
     lastPosCount = 0 # shit
-
+    goal_mode = False
     # main loop
     while True:
         # For AI solutions, this is a good starting point: it is enough
         # to keep the current target updated
-        target = patrolTargets[target_id] # get the target from list
+        if goal_mode:
+            target = [0,0]
+        else:    
+            target = patrolTargets[target_id] # get the target from list
 
         pos = bot.get_position()
         arr = bot.startGetBalls()
 
         while True:
-            if arr:
-                target = arr
-                break
+            if not goal_mode:
+                if arr:
+                    target[0], target[1] = arr[0]
+                    break
+                else:
+                    arr = bot.startGetBalls()
             else:
-                arr = bot.startGetBalls()
+                break      
         
         if(FLIP_COORDINATES):
             pos = (-pos[0], -pos[1], pos[2] + math.pi)
@@ -197,33 +201,59 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             ra += 2 * math.pi
 
         ra *= 57
-            
+        speed = 90
+        distanceToBall = abs(dx) + abs(dz)
+
+        print(pos)   
         #print("targeting", target, "rel angle", ra)
-        print(lastX-pos[0])
-        print(lastY-pos[1])
+        #print(lastX-pos[0])
+        #print(lastY-pos[1])
         #if(lastPosCount == 10):
             #Reverse
-        if(abs(lastX-pos[0]) < 2. and abs(lastY-pos[1]) < 2.):
-            lastPosCount += 1
-        print(lastPosCount)
+        #if(abs(lastX-pos[0]) < 2. and abs(lastY-pos[1]) < 2.):
+        #    lastPosCount += 1
+        #print(lastPosCount)
         lastX = pos[0]
         lastY = pos[1]
 
         #turn the face towards the goal; about 10 degrees of precision is sufficient. Then march!
-        limit = 40.
-        limitn = -40.
+        limit1 = 60.
+        #limit1n = -60.
+        limit2 = 40.
+        #limit2n = -40.
+        limit3 = 30.
+        #limit3n = -30.
+        limit4 = 20.
+        #limit4n = -20.
+        limit5 = 10.
+        #limit5n = -10. 
 
-        if ra < limitn or ra > limit:
+        if ra < -limit1 or ra > limit1:
             bot.set_motors(speed, 0) # turn right
+            time.sleep(0.13)
             bot.set_motors(0, 0) # turn right
-       ## elif ra > limit:
-          ##  bot.set_motors(0, speed) # turn left
+        elif ra < -limit2 or ra > limit2:
+            bot.set_motors(speed, 0) # turn right
+            time.sleep(0.08)
+            bot.set_motors(0, 0) # turn right
+        elif ra < -limit3 or ra > limit3:
+            bot.set_motors(speed, 0) # turn right
+            time.sleep(0.06)
+            bot.set_motors(0, 0) # turn right
+        elif ra < -limit4 or ra > limit4:
+            bot.set_motors(speed, 0) # turn right
+            time.sleep(0.04)
+            bot.set_motors(0, 0) # turn right
         else:
             bot.set_motors(speed, speed) # go straight
-        #print(abs(dx) + abs(dz))
-        if (abs(dx) + abs(dz) <= 40): # switch to the next target if close enough
-            target_id += 1
-            target_id %= len(patrolTargets)
+        print(abs(dx) + abs(dz))
+        if (abs(dx) + abs(dz) <= 120):
+            goal_mode = True
+        else:
+            goal_mode = False
+        #if (abs(dx) + abs(dz) <= 40): # switch to the next target if close enough
+            #target_id += 1
+            #target_id %= len(patrolTargets)
 
 aruco_coordinator.release()
 
